@@ -32,6 +32,14 @@ app.get("/api/data", (req, res) => {
   let sentBytes = 0;
 
   const sendProgressUpdate = () => {
+    const io = require("socket.io")(httpServer, {
+      pingTimeout: 60000,
+      cors: { origin: "http://localhost:5173" },
+    });
+
+    io.on("connection", (socket) => {
+      console.log("CONNECTED!");
+    });
     if (sentBytes < expectedDataSize) {
       const progress = (sentBytes / expectedDataSize) * 100;
       res.write(JSON.stringify({ progress }));

@@ -23,40 +23,24 @@ function App() {
     setError(null); // Clear any previous errors
 
     try {
-      const response = await axios.get("http://localhost:4000/api/data");
-      console.log("resssp: ", response.data);
-      setData(response.data);
-    } catch (error) {
-      console.error(error);
-      setError(error.message || "An error occurred"); // Handle potential error messages
+      console.log("1");
+      const eventSource = new EventSource("http://localhost:4000/api/data");
+      setIsLoading(false);
+      console.log("1p: ", eventSource);
+      eventSource.onmessage = (event) => {
+        console.log("2");
+        const progressValue = parseInt(event.data);
+        setProgress(progressValue);
+      };
+      eventSource.onerror = (error) => {
+        console.log("3");
+        console.error(error);
+        setError(error.message || "An error occurred"); // Handle potential error messages
+      };
     } finally {
+      console.log("4");
       setIsLoading(false);
     }
-  };
-
-  const source = axios.CancelToken.source(); // Create cancellation token source
-
-  useEffect(() => {
-    const fetchDataWithProgress = async () => {
-      const config = {
-        onDownloadProgress: (event) => {
-          const percentCompleted = Math.round(
-            (event.loaded * 100) / event.total
-          );
-          console.log("percentCompleted: ", percentCompleted, "%");
-          setProgress(percentCompleted);
-        },
-        cancelToken: source.token,
-      };
-    };
-
-    fetchDataWithProgress();
-
-    return () => source.cancel("Request canceled (cleanup)"); // Cleanup function for cancellation
-  }, []); // Run effect only once on component mount
-
-  const handleCancel = () => {
-    source.cancel("Request canceled by user"); // Cancel the request
   };
 
   const renderProgress = () => {
@@ -78,9 +62,6 @@ function App() {
       {error && <p className="error-message">{error}</p>}
       {data && <p>Data: {JSON.stringify(data)}</p>}
       {renderProgress()}
-      <button onClick={handleCancel} disabled={!isLoading}>
-        Cancel
-      </button>
     </div>
   );
 }

@@ -31,9 +31,11 @@ app.get("/api/data", (req, res) => {
 
   let sentBytes = 0;
 
-  const session = req.session;
-  session.count = (session.count || 0) + 1;
-  io.to(session.id).emit("current count", session.count);
+  res.writeHead(200, {
+    "Content-Type": "text/event-stream",
+    "Cache-Control": "no-cache",
+    Connection: "keep-alive",
+  });
 
   const sendProgressUpdate = async () => {
     // const io = require("socket.io")(server, {

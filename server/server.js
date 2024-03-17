@@ -41,7 +41,22 @@ app.get("/api/data", (req, res) => {
   //   });
   const intervalId = setInterval(() => {
     const date = new Date().toDateString();
-    res.write(`data: ${date}\n\n`);
+    let progress;
+
+    if (sentBytes < expectedDataSize) {
+      progress = ((sentBytes / expectedDataSize) * 100).toLocaleString();
+      console.log("progress: ", progress);
+      console.log("typeof progress ", typeof progress.toLocaleString());
+      //   res.write(JSON.stringify({ progress }));
+      res.write(`data: ${progress}\n\n`);
+      //   res.write(`${progress}`);
+      //   res.write(progress.toString());
+      res.status(200);
+      sentBytes += chunkSize;
+      //   setTimeout(sendProgressUpdate, 100); // Simulate delay between chunks
+    } else {
+      res.end(JSON.stringify({ data: "Your actual data" })); // Send actual data
+    }
   }, 1000);
   const sendProgressUpdate = async () => {
     // const io = require("socket.io")(server, {

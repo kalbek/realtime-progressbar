@@ -12,6 +12,7 @@ function App() {
     const eventSource = new EventSource("http://localhost:4000/api/data");
 
     eventSource.onmessage = function (event) {
+      console.log("yeee");
       console.log(event.data);
       setProgress(event.data);
     };
@@ -61,7 +62,7 @@ function App() {
         {isLoading ? "Loading..." : "Get Data"}
       </button>
       {error && <p className="error-message">{error}</p>}
-      {data && <p>Data: {JSON.stringify(data)}</p>}
+      <p>Data: {progress}</p>
       {renderProgress()}
     </div>
   );

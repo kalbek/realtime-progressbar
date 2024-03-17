@@ -31,19 +31,19 @@ app.get("/api/data", (req, res) => {
 
   let sentBytes = 0;
 
-  const sendProgressUpdate = () => {
-    const io = require("socket.io")(httpServer, {
-      pingTimeout: 60000,
-      cors: { origin: "http://localhost:5173" },
-    });
+  const session = req.session;
+  session.count = (session.count || 0) + 1;
+  io.to(session.id).emit("current count", session.count);
 
-    io.on("connection", (socket) => {
-      console.log("CONNECTED!");
-    });
+  const sendProgressUpdate = async () => {
+    // const io = require("socket.io")(server, {
+    //   pingTimeout: 60000,
+    //   cors: { origin: "http://localhost:3000" },
+    // });
     if (sentBytes < expectedDataSize) {
       const progress = (sentBytes / expectedDataSize) * 100;
       res.write(JSON.stringify({ progress }));
-      //   res.status(200).json(progress);
+      res.status(200);
       sentBytes += chunkSize;
       setTimeout(sendProgressUpdate, 100); // Simulate delay between chunks
     } else {
@@ -58,6 +58,6 @@ httpServer.listen(4000, () => {
   console.log("Server listening on port 4000");
 });
 
-io.on("connection", (socket) => {
-  console.log("connected to soccet.io");
-});
+// io.on("connection", (socket) => {
+//   console.log("connected to soccet.io");
+// });

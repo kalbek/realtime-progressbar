@@ -25,35 +25,47 @@ io.engine.use(sessionMiddleware);
 app.set("socketio", io);
 // Simulated progress logic (replace with your actual data retrieval process)
 app.get("/api/data", (req, res) => {
-  console.log("got mee");
+  console.log("Client connected!");
+  res.setHeader("Content-Type", "text/event-stream");
+  res.setHeader("Access-Control-Allow-Origin", "*");
+
   const expectedDataSize = 10000; // Replace with actual expected size (if known)
   const chunkSize = 100; // Size of simulated progress chunks
 
   let sentBytes = 0;
 
-  res.writeHead(200, {
-    "Content-Type": "text/event-stream",
-    "Cache-Control": "no-cache",
-    Connection: "keep-alive",
-  });
-
+  //   res.writeHead(200, {
+  //     "Content-Type": "text/event-stream",
+  //     "Cache-Control": "no-cache",
+  //     Connection: "keep-alive",
+  //   });
+  const intervalId = setInterval(() => {
+    const date = new Date().toDateString();
+    res.write(`data: ${date}\n\n`);
+  }, 1000);
   const sendProgressUpdate = async () => {
     // const io = require("socket.io")(server, {
     //   pingTimeout: 60000,
     //   cors: { origin: "http://localhost:3000" },
     // });
-    if (sentBytes < expectedDataSize) {
-      const progress = (sentBytes / expectedDataSize) * 100;
-      res.write(JSON.stringify({ progress }));
-      res.status(200);
-      sentBytes += chunkSize;
-      setTimeout(sendProgressUpdate, 100); // Simulate delay between chunks
-    } else {
-      res.end(JSON.stringify({ data: "Your actual data" })); // Send actual data
-    }
+    // if (sentBytes < expectedDataSize) {
+    //   const progress = (sentBytes / expectedDataSize) * 100;
+    //   res.write(JSON.stringify({ progress }));
+    //   res.status(200);
+    //   sentBytes += chunkSize;
+    //   setTimeout(sendProgressUpdate, 100); // Simulate delay between chunks
+    // } else {
+    //   res.end(JSON.stringify({ data: "Your actual data" })); // Send actual data
+    // }
   };
 
   sendProgressUpdate();
+
+  res.on("close", () => {
+    console.log("Client closed connection.");
+    clearInterval(intervalId);
+    res.end();
+  });
 });
 
 httpServer.listen(4000, () => {

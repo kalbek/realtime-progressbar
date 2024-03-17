@@ -48,20 +48,6 @@ function App() {
         },
         cancelToken: source.token,
       };
-
-      // try {
-      //   const response = await axios.get("/api/data", config);
-      //   setData(response.data);
-      // } catch (error) {
-      //   if (axios.isCancel(error)) {
-      //     console.log("Request canceled");
-      //   } else {
-      //     console.error(error);
-      //     setError(error.message || "An error occurred"); // Handle potential error messages
-      //   }
-      // } finally {
-      //   setIsLoading(false);
-      // }
     };
 
     fetchDataWithProgress();
@@ -95,12 +81,6 @@ function App() {
       <button onClick={handleCancel} disabled={!isLoading}>
         Cancel
       </button>
-
-      {isLoading && (
-        <div className="progress-bar">yyyy
-          <div className="progress" style={{ width: `${progress}%` }}></div>
-        </div>
-      )}
     </div>
   );
 }
